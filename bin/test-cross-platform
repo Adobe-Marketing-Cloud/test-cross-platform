@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const minimist = require('minimist');
+const cli = require('../src/cli');
+
+const argv = minimist(process.argv.slice(2));
+
+process.stderr.write('\n');
+cli(argv);
+process.on('exit', () => process.stderr.write('\n'));
