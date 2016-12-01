@@ -44,12 +44,12 @@ module.exports = class TestCrossPlatform {
         }
     }
 
-    run(tunnel, server, gateway) {
+    run(tunnel, server, unitTests) {
         // Start server, create the tunnel, start the jobs and wait for them to finish...
         server.start(this.config.port)
             .then(() => tunnel.create(this.config.port))
-            .then(() => gateway.start(this.config, tunnel.baseUrl))
-            .then(tests => gateway.checkStatus(this.config, tests))
+            .then(() => unitTests.start(this.config, tunnel.baseUrl))
+            .then(tests => unitTests.checkStatus(this.config, tests))
             .then(tests => this.sendResult(tests))
             .catch(err => this.emitter.emit("error", err))
             .finally(() => this.destroy(tunnel, server));

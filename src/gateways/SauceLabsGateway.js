@@ -6,7 +6,7 @@ const getCheckStatusParams = require("./gatewayParams").getCheckStatusParams;
 const CHECK_STATUS_INTERVAL = 2000;
 const API_URL = "https://saucelabs.com/rest/v1/";
 
-module.exports = class JsUnitTestsGateway {
+module.exports = class SauceLabsGateway {
     constructor(publish) {
         this.publish = publish;
     }

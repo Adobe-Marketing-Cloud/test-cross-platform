@@ -7,7 +7,7 @@ const publish = new EventEmitter().emit;
 var s;
 
 test("Server's interface:", (t) => {
-    s = new Server({ port: 9090}, publish);
+    s = new Server(publish);
 
     t.ok(s, "Server instance should be valid");
     t.ok(s.start, "Should have a start method");
@@ -17,7 +17,7 @@ test("Server's interface:", (t) => {
 });
 
 test("Calling server.start", (t) => {
-    s.start().then(server => {
+    s.start({ port: 9090}).then(server => {
         t.ok(server, "Start method should return the server");
         t.equal(typeof server.close, "function", "Server should have a close method");
 
