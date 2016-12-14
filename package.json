@@ -1,6 +1,6 @@
 {
   "name": "@adobe-mcid/test-cross-platform",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Runs your unit tests cross browser using Sauce Labs as default runner.",
   "main": "./src/index.js",
   "bin": "./bin/test-cross-platform",

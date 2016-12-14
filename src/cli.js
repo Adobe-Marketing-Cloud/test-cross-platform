@@ -77,8 +77,9 @@ module.exports = function(argv) {
           logTestResults(tests);
           log(chalk.green(localize("TEST_PASSED")));
       })
-      .on("failure", () => {
+      .on("failure", (tests) => {
           log(chalk.red('Oops, there were test failures!'));
+          logTestResults(tests);
           failedExit();
       })
       .on("error", (err) => {

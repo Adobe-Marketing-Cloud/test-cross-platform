@@ -4,7 +4,6 @@ const getStartParams = require("./gatewayParams").getStartParams;
 const getCheckStatusParams = require("./gatewayParams").getCheckStatusParams;
 
 const CHECK_STATUS_INTERVAL = 2000;
-const API_URL = "https://saucelabs.com/rest/v1/";
 
 module.exports = class SauceLabsGateway {
     constructor(publish) {
@@ -30,46 +29,30 @@ module.exports = class SauceLabsGateway {
     }
 
     checkStatus(config, unitTests) {
-        this.progress = {};
-        for (let id of unitTests) {
-            this.progress[id] = {};
-        }
+        this.progress = unitTests.reduce((map, id) => { 
+            map[id] = {};
+            return map;
+        }, {});
 
-        const checkStatusUrl = `${API_URL}/${config.username}/js-tests/status`;
-        const params = {
-            url: checkStatusUrl,
-            json: true,
-            body: { "js tests": unitTests },
-            auth: { username: config.username, password: config.key }
-        };
+        const params = getCheckStatusParams(config, unitTests);
 
         return new Promise((resolve, reject) => {
-            let checkJobStatus = () => {
+            const checkJobStatus = () => {
                 setTimeout(() => {
                     request.post(params, (err, response, body) => {
-                        if (err) {
-                            return reject(err);
-                        }
-
-                        if (body.error) {
+                        if (err || body.error || body.message) {
                             return reject(
-                                new Error(localize("JOBS_PROGRESS_ERROR", `(${response.statusCode}) ${body.error}`))
+                                new Error(localize("JOBS_PROGRESS_ERROR", `(${body.message}) ${body.error}`))
                             );
                         }
 
-                        if (body.message) {
-                            return reject(new Error(body.message));
-                        }
-
-                        let ongoingUnitTests = body["js tests"];
-
                         try {
-                            this.updateJobProgress(ongoingUnitTests);
+                            this.updateJobProgress(body["js tests"]);
+                            return body.completed ? resolve(body["js tests"]) : checkJobStatus();
+
                         } catch(err) {
                             return reject(err);
                         }
-
-                        return body.completed ? resolve(ongoingUnitTests) : checkJobStatus();
                     });
                 }, config.checkstatusinterval || CHECK_STATUS_INTERVAL);
             };
@@ -78,7 +61,7 @@ module.exports = class SauceLabsGateway {
     }
 
     updateJobProgress(tests) {
-        for (let test of tests) {
+        for (const test of tests) {
             test.status = test.status || localize("TEST_IS_FINISHED");
             
             if (test.status !== this.progress[test.id].status) {

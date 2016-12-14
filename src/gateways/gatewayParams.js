@@ -22,6 +22,11 @@ exports.getStartParams = (baseUrl, config) => {
     };
 };
 
-exports.getCheckStatusParams = (config) => {
-
+exports.getCheckStatusParams = (config, unitTests) => {
+    return {
+        url: `${API_URL}/${config.username}/js-tests/status`,
+        json: true,
+        body: { "js tests": unitTests },
+        auth: { username: config.username, password: config.key }
+    };
 };
